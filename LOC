@@ -12,10 +12,10 @@ Write-Host "  Made by JustValkz " -ForegroundColor Blue -NoNewline
 Write-Host " - LOC PowerShell T1-T3" -ForegroundColor White
 Write-Host ""
 
-for ($i = 0; $i -le 10; $i++) {
+for ($i = 0; $i -le 10; $i++) {Add commentMore actions
     $percent = $i * 10
     $bar = "#" * $i + "-" * (10 - $i)
-    Write-Host -NoNewline "r[ $bar ] $percent%"
+    Write-Host -NoNewline "`r[ $bar ] $percent%"
     Start-Sleep -Milliseconds 300
 }
 Write-Host ""
