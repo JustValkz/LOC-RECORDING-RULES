@@ -35,6 +35,7 @@ $blacklist = @("matcha", "olduimatrix", "autoexe", "bin", "workspace", "monkeyai
 $suspiciousList = @("isabelle", "xeno", "solara", "bootstrapper", "bootstrappernew", "loader", "santoware", "mystw", "severe", "mapper", "thunderclient", "monkeyaim", "olduimatrix", "matrix", "matcha")
 $watchlist = @("BOOTSTRAPPERNEW.EXE", "BOOTSTRAPPER.EXE", "XENO.EXE", "XENOUI.EXE", "SOLARA.EXE", "MAPPER.EXE", "LOADER.EXE", "MATCHA.EXE", "EVOLVE.EXE")
 
+# --- Check for exclusion paths
 try {
     $exclusions = Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
     $exclusionsOutput += if ($exclusions) {
@@ -46,6 +47,7 @@ try {
     $exclusionsOutput += "WARNING: Could not get exclusion paths. MUST RUN AS ADMINISTRATOR!"
 }
 
+# --- Check for active or past threats
 try {
     $threats = Get-MpThreat
     if ($threats) {
@@ -66,6 +68,7 @@ try {
     $threatsOutput += "WARNING: Could not check for threats."
 }
 
+# --- OS verification
 try {
     if ($env:OS -eq "Windows_NT" -and (Get-CimInstance Win32_OperatingSystem -ErrorAction Stop)) {
         $windowsOutput += "SUCCESS: Running on real Windows."
@@ -76,6 +79,7 @@ try {
     $windowsOutput += "FAILURE: Not running on real Windows."
 }
 
+# --- Memory integrity
 try {
     $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity"
     $enabled = Get-ItemPropertyValue -Path $regPath -Name "Enabled" -ErrorAction Stop
@@ -89,6 +93,7 @@ try {
     $memoryIntegrityOutput += "FAILURE: MEMORY INTEGRITY IS NOT SUPPORTED."
 }
 
+# --- Defender check
 try {
     $defender = Get-MpComputerStatus
     if ($defender.AMServiceEnabled) {
@@ -110,6 +115,7 @@ try {
     $defenderOutput += "WARNING: Could not check realtime protection status."
 }
 
+# --- Registry tracking of suspicious EXE
 try {
     $muiPath = "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
     $registryEntries = Get-ItemProperty -Path $muiPath -ErrorAction Stop | Select-Object -Property *
@@ -128,6 +134,7 @@ try {
     $registryOutput += "WARNING: Could not access registry path for .exe tracking."
 }
 
+# --- Drive usage
 try {
     $drives = Get-PSDrive -PSProvider FileSystem
     foreach ($drive in $drives) {
@@ -139,22 +146,21 @@ try {
     $drivesOutput += "WARNING: Could not enumerate drives."
 }
 
+# --- EXPLOIT HASH + FOLDER CHECK (UPDATED)
 try {
-    $knownHashes = @("A89E3321B2BC0A90C21714F153E26DCF2BDEA4BC7200AF9C8CA8394FF54470A1")
-    $matched = $false
-    foreach ($hash in $knownHashes) {
-        if ($hash -eq "A89E3321B2BC0A90C21714F153E26DCF2BDEA4BC7200AF9C8CA8394FF54470A1") {
-            $exploitOutput += "FAILURE: Exploit Detected - SHA256 Match: Isabelle"
-            $matched = $true
-        }
-    }
-    if (-not $matched) {
-        $exploitOutput += "SUCCESS: No Exploits were detected by Hashs or file directory's"
+    $knownHash = "A89E3321B2BC0A90C21714F153E26DCF2BDEA4BC7200AF9C8CA8394FF54470A1"
+    $appdataFolderExists = Test-Path "$env:APPDATA\Isabelle"
+
+    if ($knownHash -eq "A89E3321B2BC0A90C21714F153E26DCF2BDEA4BC7200AF9C8CA8394FF54470A1" -and $appdataFolderExists) {
+        $exploitOutput += "FAILURE: Exploit Detected - SHA256 match and Isabelle folder found in %AppData%"
+    } else {
+        $exploitOutput += "SUCCESS: Isabelle and Evolve were not found."
     }
 } catch {
     $exploitOutput += "WARNING: Exploit hash check failed."
 }
 
+# --- Prefetch file scan
 try {
     $now = Get-Date
     $pfFiles = Get-ChildItem "C:\Windows\Prefetch" -Filter "*.pf" -ErrorAction Stop
@@ -172,6 +178,7 @@ try {
     $prefetchOutput += "WARNING: Prefetch files could not be listed or access denied."
 }
 
+# --- KeyAuth folder scan
 try {
     $folders = Get-ChildItem "C:\ProgramData\KeyAuth\debug" -Directory -ErrorAction Stop
     foreach ($folder in $folders) {
@@ -181,6 +188,7 @@ try {
     $keyAuthOutput += "SUCCESS: No folders detected in Key Checker."
 }
 
+# --- Print formatted output
 function Write-Section {
     param(
         [string]$Title,
