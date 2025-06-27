@@ -18,7 +18,7 @@ for ($i = 0; $i -le 10; $i++) {
     Write-Host "`r[ $bar ] $percent%" -NoNewline
     Start-Sleep -Milliseconds 300
 }
-Write-Host ""  # Move to a new line after progress is complete
+Write-Host ""
 
 $exclusionsOutput = @()
 $threatsOutput = @()
@@ -31,12 +31,8 @@ $exploitOutput = @()
 $prefetchOutput = @()
 $keyAuthOutput = @()
 
-# Full blacklist - no change here
 $blacklist = @("matcha", "olduimatrix", "autoexe", "bin", "workspace", "monkeyaim", "thunderaim", "thunderclient", "celex", "release", "matrix", "matcha.exe", "triggerbot", "solara", "xeno", "wave", "cloudy", "tupical", "horizon", "myst", "celery", "zarora", "juju", "nezure", "FusionHacks.zip", "release.zip", "bootstrapper", "aimmy.exe", "aimmy", "Fluxus", "clumsy", "build", "build.zip", "build.rar", "MystW.exe", "isabelle", "dx9", "dx9ware")
-
-# Your specific whitelist for warnings in registry check only:
 $suspiciousList = @("isabelle", "xeno", "solara", "bootstrapper", "bootstrappernew", "loader", "santoware", "mystw", "severe", "mapper", "thunderclient", "monkeyaim", "olduimatrix", "matrix", "matcha")
-
 $watchlist = @("BOOTSTRAPPERNEW.EXE", "BOOTSTRAPPER.EXE", "XENO.EXE", "XENOUI.EXE", "SOLARA.EXE", "MAPPER.EXE", "LOADER.EXE", "MATCHA.EXE", "EVOLVE.EXE")
 
 try {
@@ -118,12 +114,9 @@ try {
     $muiPath = "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
     $registryEntries = Get-ItemProperty -Path $muiPath -ErrorAction Stop | Select-Object -Property *
     foreach ($prop in $registryEntries.PSObject.Properties) {
-        # Lowercase name for case insensitive comparison
         $propNameLower = $prop.Name.ToLower()
-
         foreach ($word in $blacklist) {
             if ($propNameLower -like "*$word*") {
-                # Only warn if word is in suspiciousList
                 if ($suspiciousList -contains $word) {
                     $registryOutput += "WARNING: Detected suspicious registry key: $($prop.Name)"
                 }
@@ -169,7 +162,6 @@ try {
         $name = $pf.BaseName.ToUpper()
         $lastWrite = $pf.LastWriteTime
         $hoursAgo = [math]::Round(($now - $lastWrite).TotalHours, 2)
-
         if ($watchlist -contains "$name.EXE") {
             $prefetchOutput += "WARNING: Suspicious prefetch file: $name | Modified: $hoursAgo hours ago"
         } else {
