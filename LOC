@@ -3,7 +3,7 @@ Write-Host " (        )          (                  )   (    (     (        )   
 Write-Host " )\ )  ( /(    (     )\ )        (   ( /(   )\ ) )\ )  )\ )  ( /(  (        )\ )  ( /(   )\ )  )\ )   (     ( /(  " -ForegroundColor White
 Write-Host "(()/(  )##))   )\   (()/( (      )\  )##)) (()/((()/( (()/(  )##)) )\ )    (()/(  )##)) (()/( (()/(   )\    )##)) " -ForegroundColor White
 Write-Host " /(_))((_)\  (((_)   /(_)))\   (((_)((_)\   /(_))/(_)) /(_))((_)\ (()/(     /(_))((_)\   /(_)) /(_))(((_)  ((_)\  " -ForegroundColor White
-Write-Host "(_))    ((_) )\___  (_)) ((_)  )\___  ((_) (_)) (_))_ (_))   _((_) /(_))_  (_))    ((_) (_))  (_))  )\___ __ ((_) " -ForegroundColor White
+Write-Host "(_))    ((_) )\___  (_)) ((_)  )\___  ((_) (_)) (_)) (_))   _((_) /(_))_  (_))    ((_) (_))  (_))  )\___ __ ((_) " -ForegroundColor White
 Write-Host "| |    / _ ##(/ __| | _ \| __|((/ __|/ _ \ | _ \ |   \|_ _| | \| |(_)) __|  | _ \  / _ \ | |   |_ _|((/ __|\ \ / / " -ForegroundColor White
 Write-Host "| |__ | (_) || (__  |   /| _|  | (__| (_) ||   / | |) || |  | .  |  | (_    |  _/ | (_) || |__  | |  | (__  \ V /  " -ForegroundColor White
 Write-Host "|____| \___/  \___| |_|_\|___|  \___|\___/ |_|_\ |___/|___| |_|\_|   \___|  |_|    \___/ |____||___|  \___|  |_|   " -ForegroundColor White
@@ -25,12 +25,8 @@ $threatsOutput = @()
 $windowsOutput = @()
 $memoryIntegrityOutput = @()
 $defenderOutput = @()
-$registryOutput = @()
-$drivesOutput = @()
 $exploitOutput = @()
 $prefetchOutput = @()
-$keyAuthOutput = @()
-
 $blacklist = @("matcha", "olduimatrix", "autoexe", "bin", "workspace", "monkeyaim", "thunderaim", "thunderclient", "celex", "release", "matrix", "matcha.exe", "triggerbot", "solara", "xeno", "wave", "cloudy", "tupical", "horizon", "myst", "celery", "zarora", "juju", "nezure", "FusionHacks.zip", "release.zip", "bootstrapper", "aimmy.exe", "aimmy", "Fluxus", "clumsy", "build", "build.zip", "build.rar", "MystW.exe", "isabelle", "dx9", "dx9ware")
 $suspiciousList = @("isabelle", "xeno", "solara", "bootstrapper", "bootstrappernew", "loader", "santoware", "mystw", "severe", "mapper", "thunderclient", "monkeyaim", "olduimatrix", "matrix", "matcha")
 $watchlist = @("BOOTSTRAPPERNEW.EXE", "BOOTSTRAPPER.EXE", "XENO.EXE", "XENOUI.EXE", "SOLARA.EXE", "MAPPER.EXE", "LOADER.EXE", "MATCHA.EXE", "EVOLVE.EXE")
@@ -47,50 +43,60 @@ try {
     $exclusionsOutput += "WARNING: Could not get exclusion paths. MUST RUN AS ADMINISTRATOR!"
 }
 
-# --- Check for active or past threats
+# --- Check for active or past threats (Updated)
 try {
-    $threats = Get-MpThreat
-    if ($threats) {
-        foreach ($threat in $threats) {
-            $line = "$($threat.ThreatName) | Status: $($threat.Status) | ActionSuccess: $($threat.ActionSuccess) | Resources: $($threat.Resources)"
-            if ($threat.Status -eq "Active" -or $threat.ActionSuccess -eq $false -or $threat.Status -eq "Allowed") {
-                $threatsOutput += "FAILURE: $line"
-            } elseif ($threat.Status -eq "Quarantined" -or $threat.Status -eq "Resolved") {
-                $threatsOutput += "SUCCESS: $line"
-            } else {
-                $threatsOutput += "FAILURE: Uncertain threat status - $line"
-            }
+    # Import Defender module
+    Import-Module Defender -ErrorAction SilentlyContinue
+
+    # Retrieve threats
+    $threats = Get-MpThreatDetection
+} catch {
+    Write-Error "Failed to retrieve threat information. Ensure Windows Defender is enabled and the PowerShell module is available."
+    exit
+}
+
+# Filter active, not quarantined threats
+$activeNotQuarantinedThreats = $threats | Where-Object { $_.ThreatStatus -eq "Active" -and $_.QuarantineStatus -ne "Quarantined" }
+
+if ($activeNotQuarantinedThreats) {
+    $activeNotQuarantinedThreats | ForEach-Object {
+        Write-Output "Threat Name: $($_.ThreatName)"
+        Write-Output "Severity: $($_.Severity)"
+        Write-Output "Path: $($_.Path)"
+        Write-Output "Detection Time: $($_.DetectionTime)"
+        Write-Output "----------------------------------------"
+        $threatsOutput += "FAILURE: Threat detected - Name: $($_.ThreatName), Severity: $($_.Severity), Path: $($_.Path), Detected: $($_.DetectionTime)"
+    }
+} else {
+    $threatsOutput += "SUCCESS: No active threats that are not quarantined."
+}
+
+# --- Memory integrity and Vulnerable Blocklist check
+try {
+    $regPathMI = "HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity"
+    $memoryIntegrityEnabled = Get-ItemPropertyValue -Path $regPathMI -Name "Enabled" -ErrorAction Stop
+
+    # Check Vulnerable Blocklist status
+    $regPathVB = "HKLM:\Path\To\VulnerableBlocklist" # <-- Replace with actual path
+    $vulnerableBlocklistOn = $false
+    try {
+        $vbStatus = Get-ItemPropertyValue -Path $regPathVB -Name "VulnerableBlocklistStatus" -ErrorAction Stop
+        if ($vbStatus -eq 1) {
+            $vulnerableBlocklistOn = $true
         }
-    } else {
-        $threatsOutput += "SUCCESS: No threats detected."
+    } catch {
+        # If the key/value doesn't exist, assume it's off
+        $vulnerableBlocklistOn = $false
     }
-} catch {
-    $threatsOutput += "WARNING: Could not check for threats."
-}
 
-# --- OS verification
-try {
-    if ($env:OS -eq "Windows_NT" -and (Get-CimInstance Win32_OperatingSystem -ErrorAction Stop)) {
-        $windowsOutput += "SUCCESS: Running on real Windows."
+    # Determine overall memory integrity check result
+    if ($memoryIntegrityEnabled -eq 1 -or $vulnerableBlocklistOn) {
+        $memoryIntegrityOutput += "SUCCESS: Memory integrity check passed (either Memory Integrity is ON or Vulnerable Blocklist is ON)."
     } else {
-        $windowsOutput += "FAILURE: Not running on real Windows."
+        $memoryIntegrityOutput += "FAILURE: Memory integrity check failed (Memory Integrity is OFF and Vulnerable Blocklist is OFF)."
     }
 } catch {
-    $windowsOutput += "FAILURE: Not running on real Windows."
-}
-
-# --- Memory integrity
-try {
-    $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity"
-    $enabled = Get-ItemPropertyValue -Path $regPath -Name "Enabled" -ErrorAction Stop
-    $memoryIntegrityOutput += "SUCCESS: MEMORY INTEGRITY IS SUPPORTED."
-    $memoryIntegrityOutput += if ($enabled -eq 1) {
-        "SUCCESS: MEMORY INTEGRITY IS ON."
-    } else {
-        "FAILURE: MEMORY INTEGRITY IS OFF."
-    }
-} catch {
-    $memoryIntegrityOutput += "FAILURE: MEMORY INTEGRITY IS NOT SUPPORTED."
+    $memoryIntegrityOutput += "FAILURE: Memory integrity or Vulnerable Blocklist status could not be determined."
 }
 
 # --- Defender check
@@ -134,19 +140,7 @@ try {
     $registryOutput += "WARNING: Could not access registry path for .exe tracking."
 }
 
-# --- Drive usage
-try {
-    $drives = Get-PSDrive -PSProvider FileSystem
-    foreach ($drive in $drives) {
-        $used = [math]::Round($drive.Used / 1GB, 2)
-        $total = [math]::Round(($drive.Used + $drive.Free) / 1GB, 2)
-        $drivesOutput += "Drive: $($drive.Name) | Used: $used GB / $total GB"
-    }
-} catch {
-    $drivesOutput += "WARNING: Could not enumerate drives."
-}
-
-# --- EXPLOIT HASH + FOLDER CHECK (UPDATED)
+# --- Exploit HASH + FOLDER CHECK (UPDATED)
 try {
     $knownHash = "A89E3321B2BC0A90C21714F153E26DCF2BDEA4BC7200AF9C8CA8394FF54470A1"
     $appdataFolderExists = Test-Path "$env:APPDATA\Isabelle"
@@ -210,18 +204,15 @@ function Write-Section {
 
 Write-Section "Exclusions" $exclusionsOutput
 Write-Section "Threats" $threatsOutput
-Write-Section "OS Check" $windowsOutput
 Write-Section "Memory Integrity" $memoryIntegrityOutput
 Write-Section "Windows Defender" $defenderOutput
-Write-Section "Registry Check" $registryOutput
-Write-Section "Drives Check" $drivesOutput
 Write-Section "Exploit Checker" $exploitOutput
 Write-Section "Prefetch" $prefetchOutput
 Write-Section "Key Checker" $keyAuthOutput
 
 $sections = @(
-    $exclusionsOutput, $threatsOutput, $windowsOutput, $memoryIntegrityOutput,
-    $defenderOutput, $registryOutput, $drivesOutput, $exploitOutput,
+    $exclusionsOutput, $threatsOutput, $memoryIntegrityOutput,
+    $defenderOutput, $exploitOutput,
     $prefetchOutput, $keyAuthOutput
 )
 
