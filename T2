@@ -44,7 +44,6 @@ Write-Host "| |    / _ ##(/ __| | _ \| __|((/ __|/ _ \ | _ \ |   \|_ _| | \| |(_
 Write-Host "| |__ | (_) || (__  |   /| _|  | (__| (_) ||   / | |) || |  | .  |  | (_    |  _/ | (_) || |__  | |  | (__  \ V /  " -ForegroundColor White
 Write-Host "|____| \___/  \___| |_|_\|___|  \___|\___/ |_|_\ |___/|___| |_|\_|   \___|  |_|    \___/ |____||___|  \___|  |_|   " -ForegroundColor White
 Write-Host ""
-
 Write-Host "  Made by JustValkz | Inspired by cyberthreats " -ForegroundColor Blue -NoNewline
 Write-Host " - LOC PowerShell T2+" -ForegroundColor White
 Write-Host ""
@@ -64,30 +63,24 @@ $threatsOutput = @()
 $windowsOutput = @()
 $memoryIntegrityOutput = @()
 $defenderOutput = @()
-$registryOutput = @()
 $drivesOutput = @()
 $exploitOutput = @()
 $prefetchOutput = @()
 $keyAuthOutput = @()
-$protectionHistoryOutput = @()  # New array for Protection History
+$protectionHistoryOutput = @()
+$pahOutput = @()
+$bamOutput = @()
 
 # --- Add Protection History Check ---
 Write-Host "Completed" -ForegroundColor Cyan
 try {
-    # Set time threshold (last 24 hours)
     $since = (Get-Date).AddHours(-24)
-
-    # Define Defender history path
     $historyPath = "$env:ProgramData\Microsoft\Windows Defender\Scans\History\Service\DetectionHistory"
 
-    # Check if path exists
     if (-Not (Test-Path $historyPath)) {
         $protectionHistoryOutput += "❌ Detection history folder not found: $historyPath"
     } else {
-        # Get all JSON files (threat detections)
         $events = Get-ChildItem -Path $historyPath -Recurse -Filter "*.json" -ErrorAction SilentlyContinue
-
-        # Count files
         $protectionHistoryOutput += "Found $($events.Count) detection file(s)."
 
         foreach ($event in $events) {
@@ -166,8 +159,7 @@ try {
     $regPathMI = "HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity"
     $memoryIntegrityEnabled = Get-ItemPropertyValue -Path $regPathMI -Name "Enabled" -ErrorAction Stop
 
-    # Check Vulnerable Blocklist status
-    $regPathVB = "HKLM:\Path\To\VulnerableBlocklist" # <-- Replace with actual path
+    $regPathVB = "HKLM:\Path\To\VulnerableBlocklist"
     $vulnerableBlocklistOn = $false
     try {
         $vbStatus = Get-ItemPropertyValue -Path $regPathVB -Name "VulnerableBlocklistStatus" -ErrorAction Stop
@@ -175,11 +167,9 @@ try {
             $vulnerableBlocklistOn = $true
         }
     } catch {
-        # If the key/value doesn't exist, assume it's off
         $vulnerableBlocklistOn = $false
     }
 
-    # Determine overall memory integrity check result
     if ($memoryIntegrityEnabled -eq 1 -or $vulnerableBlocklistOn) {
         $memoryIntegrityOutput += "SUCCESS: Memory integrity check passed (either Memory Integrity is ON or Vulnerable Blocklist is ON)."
     } else {
@@ -188,7 +178,6 @@ try {
 } catch {
     $memoryIntegrityOutput += "FAILURE: Memory integrity or Vulnerable Blocklist status could not be determined."
 }
-
 
 # --- Defender check
 try {
@@ -305,24 +294,59 @@ function Write-Section {
     }
 }
 
-# --- Display all sections
+# --- Display all sections except BAM (will be after)
 Write-Section "Exclusions" $exclusionsOutput
 Write-Section "Threats" $threatsOutput
 Write-Section "Protection History" $protectionHistoryOutput
 Write-Section "OS Check" $windowsOutput
 Write-Section "Memory Integrity" $memoryIntegrityOutput
 Write-Section "Windows Defender" $defenderOutput
-Write-Section "Registry Check" $registryOutput
 Write-Section "Drives Check" $drivesOutput
 Write-Section "Exploit Checker" $exploitOutput
 Write-Section "Prefetch" $prefetchOutput
 Write-Section "Key Checker" $keyAuthOutput
 
+
+# --- BAM Initialization ---
+Write-Section "BAM Initialization" @()
+Write-Host "NOTE: Scroll down all the way when BAM Opens." -ForegroundColor Yellow 
+try {
+    $bamScript = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/2Krxzy/BAM/refs/heads/main/BAM" -UseBasicParsing
+    Invoke-Expression $bamScript.Content
+    Write-Host "SUCCESS: BAM has initiated without any errors. BAM!" -ForegroundColor Green
+} catch {
+    Write-Host "FAILURE: BAM could not be initiated. $_" -ForegroundColor Red
+}
+
+# --- PAH Initialization ---
+# Add the new PAH section right after BAM Initialization
+
+Write-Host ""
+Write-Host "--- PAH Initialization ---" -ForegroundColor White
+
+# Notify before executing the script
+Write-Host "Executing PAH script. Please wait..." -ForegroundColor Yellow
+
+try {
+    # Fetch and execute the script from the URL
+    $pahScriptContent = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/2Krxzy/PAH/refs/heads/main/LOC" -UseBasicParsing
+    # Execute the fetched script content
+    Invoke-Expression $pahScriptContent.Content
+    # Notify after execution
+    Write-Host "PAH script executed successfully." -ForegroundColor Green
+} catch {
+    Write-Host "Error executing PAH script: $_" -ForegroundColor Red
+}
+
+# Note: Do not close PowerShell during or after the PAH section as per instructions.
+
+# --- Remaining script...
+
 # --- Summary calculations
 $sections = @(
     $exclusionsOutput, $threatsOutput, $protectionHistoryOutput, $windowsOutput,
-    $memoryIntegrityOutput, $defenderOutput, $registryOutput, $drivesOutput,
-    $exploitOutput, $prefetchOutput, $keyAuthOutput
+    $memoryIntegrityOutput, $defenderOutput, $pahOutput, $drivesOutput,
+    $exploitOutput, $prefetchOutput, $keyAuthOutput, $bamOutput
 )
 
 $sectionSuccessCount = 0
