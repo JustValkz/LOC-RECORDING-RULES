@@ -45,7 +45,7 @@ Write-Host "| |__ | (_) || (__  |   /| _|  | (__| (_) ||   / | |) || |  | .  |  
 Write-Host "|____| \___/  \___| |_|_\|___|  \___|\___/ |_|_\ |___/|___| |_|\_|   \___|  |_|    \___/ |____||___|  \___|  |_|   " -ForegroundColor White
 Write-Host ""
 
-Write-Host "  Made by JustValkz | Inspired by CyberSecurity " -ForegroundColor Blue -NoNewline
+Write-Host "  Made by JustValkz | Inspired by cyberthreats " -ForegroundColor Blue -NoNewline
 Write-Host " - LOC PowerShell T2+" -ForegroundColor White
 Write-Host ""
 
