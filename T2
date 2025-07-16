@@ -1,4 +1,4 @@
-
+# ===================== VARIABLES =====================
 # Check for administrator privileges
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltinRole] "Administrator")) {
     Write-Error "Please run this script as an administrator."
@@ -89,6 +89,7 @@ function Write-Section {
     Import-Module Defender -ErrorAction SilentlyContinue
     $startTime = Get-Date
  
+# ===================== BEGIN SCRIPT =====================
 
 
     # ASCII Art Banner
