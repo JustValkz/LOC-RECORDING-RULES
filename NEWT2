@@ -1,0 +1,242 @@
+# ASCII Art Header in Cyan
+Write-Host @"
+| |   |  _  /  __ \ | ___ \  ___/  __ \  _  | ___ \  _  \_   _| \ | |  __ \ | ___ \  _  | |   |_   _/  __ \ \ / /
+| |   | | | | /  \/ | |_/ / |__ | /  \/ | | | |_/ / | | | | | |  \| | |  \/ | |_/ / | | | |     | | | /  \/\ V /
+| |   | | | | |     |    /|  __|| |   | | | |    /| | | | | | | .  | | __  |  __/| | | | |     | | | |     \ /
+| |___\ \_/ / \__/\ | |\ \| |___| \__/\ \_/ / |\ \| |/ / _| |_| |\  | |_\ \ | |   \ \_/ / |_____| |_| \__/\ | |
+\_____/\___/ \____/ \_| \_\____/ \____/\___/\_| \_|___/  \___/\_| \_/\____/ \_|    \___/\_____/\___/ \____/ \_/
+
+Made by @enduremysoul & @justvalkz | discord.gg/locx / discord.gg/locjd
+"@ -ForegroundColor Cyan
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIE9TIENoZWNrIC0tLQ=='))) -ForegroundColor White
+if ($env:OS -ne ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('V2luZG93c19OVA==')))) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RVJST1I6IFRoaXMgc2NyaXB0IGlzIGludGVuZGVkIGZvciBXaW5kb3dzIG9ubHku'))) -ForegroundColor Red
+    exit
+} else {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogUnVubmluZyBvbiBXaW5kb3dzLg=='))) -ForegroundColor Green
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIEdQVSBDaGVjayAoTlZJRElBKSAtLS0='))) -ForegroundColor White
+try {
+    $gpus = Get-WmiObject Win32_VideoController
+    $nvidiaGpus = $gpus | Where-Object { $_.Name -like ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('Kk5WSURJQSo='))) }
+
+    if ($nvidiaGpus.Count -gt 0) {
+        Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogTlZJRElBIEdQVSBkZXRlY3RlZDo='))) -ForegroundColor Green
+        $nvidiaGpus | ForEach-Object { Write-Host (([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IC0g'))) + $($_.Name)) -ForegroundColor Green }
+    } else {
+        Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('SU5GTzogTm8gTlZJRElBIEdQVSBmb3VuZC4='))) -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RVJST1I6IENvdWxkIG5vdCBjaGVjayBHUFUgaW5mb3JtYXRpb24u'))) -ForegroundColor Red
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIFdpbmRvd3MgUG93ZXJTaGVsbCBDaGVjayAtLS0='))) -ForegroundColor White
+$psPath = $PSVersionTable.PSEdition
+if ($psPath -eq ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RGVza3RvcA==')))) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogUnVubmluZyBvbiByZWFsIFdpbmRvd3MgUG93ZXJTaGVsbC4='))) -ForegroundColor Green
+} else {
+    Write-Host (([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('SU5GTzogTGlrZWx5IHJ1bm5pbmcgUG93ZXJTaGVsbCBDb3JlIG9yIG5vbi1zdGFuZGFyZCBzaGVsbDog'))) + $psPath) -ForegroundColor Yellow
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIFZpcnR1YWxpemVkIE1hY2hpbmUgQ2hlY2sgLS0t'))) -ForegroundColor White
+try {
+    $sysProduct = Get-WmiObject Win32_ComputerSystem
+    $manufacturer = $sysProduct.Manufacturer
+    $model = $sysProduct.Model
+
+    if ($manufacturer -match ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('Vk13YXJlfE1pY3Jvc29mdCBDb3Jwb3JhdGlvbnxWaXJ0dWFsQm94fFhlbnxRRU1VfEtWTQ=='))) -or $model -match ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('VmlydHVhbHxWTXdhcmV8VmlydHVhbEJveA==')))) {
+        Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('V0FSTklORzogU3lzdGVtIGFwcGVhcnMgdG8gYmUgcnVubmluZyBpbiBhIFZpcnR1YWwgTWFjaGluZS4='))) -ForegroundColor Yellow
+        Write-Host (([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IC0gTWFudWZhY3R1cmVyOiA='))) + $manufacturer) -ForegroundColor Yellow
+        Write-Host (([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IC0gTW9kZWw6IA=='))) + $model) -ForegroundColor Yellow
+    } else {
+        Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogUGh5c2ljYWwgbWFjaGluZSBkZXRlY3RlZC4='))) -ForegroundColor Green
+    }
+} catch {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RVJST1I6IENvdWxkIG5vdCBwZXJmb3JtIHZpcnR1YWxpemF0aW9uIGNoZWNrLg=='))) -ForegroundColor Red
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIE1lbW9yeSBJbnRlZ3JpdHkgLS0t'))) -ForegroundColor White
+$memIntegrityPath = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('SEtMTTpcU1lTVEVNXEN1cnJlbnRDb250cm9sU2V0XENvbnRyb2xcRGV2aWNlR3VhcmRcU2NlbmFyaW9zXEh5cGVydmlzb3JFbmZvcmNlZENvZGVJbnRlZ3JpdHk=')))
+$memIntegrity = Get-ItemProperty -Path $memIntegrityPath -Name ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RW5hYmxlZA=='))) -ErrorAction SilentlyContinue
+
+if ($memIntegrity.Enabled -eq 1) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogTWVtb3J5IEludGVncml0eSBzdXBwb3J0ZWQu'))) -ForegroundColor Green
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogTWVtb3J5IEludGVncml0eSBpcyBPTi4='))) -ForegroundColor Green
+} else {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RkFJTDogTWVtb3J5IEludGVncml0eSB1bnN1cHBvcnRlZCBvciBPRkYu'))) -ForegroundColor Red
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIFdpbmRvd3MgRGVmZW5kZXIgLS0t'))) -ForegroundColor White
+$realTimeDisabled = (Get-MpPreference).DisableRealtimeMonitoring
+if ($realTimeDisabled) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RkFJTDogUmVhbHRpbWUgcHJvdGVjdGlvbiBpcyBPRkYu'))) -ForegroundColor Red
+} else {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogUmVhbHRpbWUgcHJvdGVjdGlvbiBpcyBPTi4='))) -ForegroundColor Green
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIERlZmVuZGVyIEV4Y2x1c2lvbnMgLS0t'))) -ForegroundColor White
+$excl = @()
+$pref = Get-MpPreference
+
+if ($pref.ExclusionProcess) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RXhjbHVzaW9uIFByb2Nlc3Nlczo='))) -ForegroundColor Yellow
+    $pref.ExclusionProcess | ForEach-Object { Write-Host (([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IC0g'))) + $_) -ForegroundColor Yellow }
+    $excl += $pref.ExclusionProcess
+}
+if ($pref.ExclusionPath) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RXhjbHVzaW9uIFBhdGhzOg=='))) -ForegroundColor Yellow
+    $pref.ExclusionPath | ForEach-Object { Write-Host (([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IC0g'))) + $_) -ForegroundColor Yellow }
+    $excl += $pref.ExclusionPath
+}
+if ($pref.ExclusionExtension) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RXhjbHVzaW9uIEV4dGVuc2lvbnM6'))) -ForegroundColor Yellow
+    $pref.ExclusionExtension | ForEach-Object { Write-Host (([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IC0g'))) + $_) -ForegroundColor Yellow }
+    $excl += $pref.ExclusionExtension
+}
+
+if ($excl.Count -eq 0) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogTm8gRGVmZW5kZXIgZXhjbHVzaW9ucyBzZXQu'))) -ForegroundColor Green
+} else {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('V0FSTklORzogRGVmZW5kZXIgZXhjbHVzaW9ucyBkZXRlY3RlZCBhYm92ZS4='))) -ForegroundColor Yellow
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIEFsbG93ZWQgVGhyZWF0cyAtLS0='))) -ForegroundColor White
+$allowedThreats = Get-MpThreatDetection | Where-Object {
+    ($_.ThreatStatus -eq ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('QWxsb3dlZA=='))) -or $_.ThreatStatus -eq ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('QWxsb3dlZEJ5VXNlcg==')))) -and
+    ($_.Resources -and $_.Resources.Count -gt 0)
+}
+
+if (!$allowedThreats -or $allowedThreats.Count -eq 0) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogTm8gYWN0aXZlIGFsbG93ZWQgdGhyZWF0cy4='))) -ForegroundColor Green
+} else {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('V0FSTklORzogQWN0aXZlIGFsbG93ZWQgdGhyZWF0cyBkZXRlY3RlZCE='))) -ForegroundColor Red
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIFJlc3RvcmVkIFRocmVhdHMgKHBhc3QgNyBkYXlzKSAtLS0='))) -ForegroundColor White
+$sevenDaysAgo = (Get-Date).AddDays(-7)
+
+try {
+    $events = Get-WinEvent -FilterHashtable @{
+        LogName   = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('TWljcm9zb2Z0LVdpbmRvd3MtV2luZG93cyBEZWZlbmRlci9PcGVyYXRpb25hbA==')))
+        StartTime = $sevenDaysAgo
+    } -ErrorAction Stop
+} catch {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RVJST1I6IENvdWxkIG5vdCBhY2Nlc3MgRGVmZW5kZXIgZXZlbnQgbG9nLiBSdW4gYXMgQWRtaW5pc3RyYXRvcj8='))) -ForegroundColor Red
+    return
+}
+
+$restoredThreats = @()
+
+foreach ($event in $events) {
+    $xml = [xml]$event.ToXml()
+    $eventID = $xml.Event.System.EventID
+
+    if ($eventID -eq 1009 -or $xml.InnerXml -like ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('KnJlc3RvcmVkKg==')))) {
+        $threatName = $xml.Event.EventData.Data | Where-Object { $_.Name -match ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('VGhyZWF0TmFtZXxOYW1l'))) } | Select-Object -ExpandProperty ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('I3RleHQ='))) -ErrorAction SilentlyContinue
+        if ($threatName) {
+            $restoredThreats += $threatName
+        } else {
+            $restoredThreats += $event.Message
+        }
+    }
+}
+
+if ($restoredThreats.Count -eq 0) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('U1VDQ0VTUzogTm8gcmVzdG9yZWQgdGhyZWF0cyBpbiB0aGUgcGFzdCA3IGRheXMu'))) -ForegroundColor Green
+} else {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('V0FSTklORzogUmVzdG9yZWQgdGhyZWF0cyBmb3VuZCBpbiB0aGUgcGFzdCA3IGRheXM6'))) -ForegroundColor Yellow
+    $restoredThreats | Sort-Object -Unique | ForEach-Object {
+        Write-Host (([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IC0g'))) + $_) -ForegroundColor Yellow
+    }
+}
+
+# --- Press Enter to Continue ---
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('YG5QcmVzcyBFbnRlciB0byBDb250aW51ZS4uLg=='))) -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
+
+# --- Check if running as Administrator ---
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('QWRtaW5pc3RyYXRvcg=='))))) {
+    Write-Warning ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('VGhpcyBzY3JpcHQgbXVzdCBiZSBydW4gYXMgQWRtaW5pc3RyYXRvci4gRXhpdGluZy4uLg==')))
+    exit
+}
+
+
+$prefetchPath = ($env + ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('OlN5c3RlbVJvb3RcUHJlZmV0Y2g='))))
+$cutoffTime = (Get-Date).AddHours(-24)
+$prefetchFiles = Get-ChildItem -Path $prefetchPath -Filter *.pf -ErrorAction SilentlyContinue
+$recentExecutions = @()
+
+foreach ($file in $prefetchFiles) {
+    $lastRunTime = $file.LastAccessTime
+    if ($lastRunTime -ge $cutoffTime) {
+        $exeName = $file.BaseName -replace ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS4q'))), ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LmV4ZQ==')))
+        $hoursAgo = [math]::Round(((Get-Date) - $lastRunTime).TotalHours, 2)
+
+        $recentExecutions += [PSCustomObject]@{
+            ExeName     = $exeName
+            LastRunTime = $lastRunTime
+            HoursAgo    = $hoursAgo
+        }
+    }
+}
+
+$recentExecutions = $recentExecutions | Sort-Object LastRunTime
+Clear-Host
+
+if ($recentExecutions.Count -eq 0) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('Tm8gcmVjZW50IHByZWZldGNoIGV4ZWN1dGlvbnMgaW4gdGhlIGxhc3QgMjQgaG91cnMu'))) -ForegroundColor Green
+} else {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('LS0tIFJlY2VudCBQcmVmZXRjaCBFeGVjdXRpb25zIChsYXN0IDI0IGhvdXJzKSAtLS0='))) -ForegroundColor White
+    foreach ($entry in $recentExecutions) {
+        Write-Output ($($entry.ExeName) + ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IHwgTGFzdCBSdW46IA=='))) + $($entry.LastRunTime) + ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IHwg'))) + $($entry.HoursAgo) + ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('IGhvdXJzIGFnbw=='))))
+    }
+}
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('YG5QcmVzcyBFbnRlciB0byBDb250aW51ZS4uLg=='))) -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('PT09IEJBTSBDaGVjayA9PT0='))) -ForegroundColor Cyan
+iex (iwr ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzJLcnh6eS9CQU0vcmVmcy9oZWFkcy9tYWluL0JBTQ=='))))
+
+# --- Wait for User to Continue ---
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('YG5QcmVzcyBFbnRlciB0byBDb250aW51ZS4uLg=='))) -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
+
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('PT09IFVTQiBEZXZpZXcgPT09'))) -ForegroundColor Cyan
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('Tk9URTogU2Nyb2xsIGFsbCB0aGUgd2F5IGRvd24gd2hlbiBvcGVuZWQu'))) -ForegroundColor Yellow
+
+$usbUrl = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('aHR0cHM6Ly93d3cubmlyc29mdC5uZXQvdXRpbHMvdXNiZGV2aWV3LnppcA==')))
+$zipPath = ($env + ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('OlRFTVBcdXNiZGV2aWV3LnppcA=='))))
+$extractPath = ($env + ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('OlRFTVBcdXNiZGV2aWV3'))))
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RG93bmxvYWRpbmcgVVNCRGV2aWV3Li4u'))) -ForegroundColor Green
+Invoke-WebRequest -Uri $usbUrl -OutFile $zipPath
+
+Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RXh0cmFjdGluZyBVU0JEZXZpZXcuLi4='))) -ForegroundColor Green
+Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+
+$usbExe = Get-ChildItem -Path $extractPath -Filter ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('VVNCRGV2aWV3LmV4ZQ=='))) -Recurse | Select-Object -First 1
+
+if ($usbExe) {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('TGF1bmNoaW5nIFVTQkRldmlldy4uLg=='))) -ForegroundColor Green
+    Start-Process $usbExe.FullName
+} else {
+    Write-Host ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('RVJST1I6IFVTQkRldmlldy5leGUgbm90IGZvdW5kIQ=='))) -ForegroundColor Red
+}
