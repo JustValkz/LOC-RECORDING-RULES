@@ -238,7 +238,7 @@ if ($usbExe) {
     Write-Host "ERROR: USBDeview.exe not found!" -ForegroundColor Red
 }
 
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
@@ -248,25 +248,25 @@ Write-Host "=== Registry Check ===" -ForegroundColor Cyan
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
 Start-Process regedit.exe
 Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
 Start-Process regedit.exe
 Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
 Start-Process regedit.exe
 Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
 Start-Process regedit.exe
 Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
@@ -284,7 +284,7 @@ Start-Process $procexpPath
 
 Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
 
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
@@ -302,6 +302,6 @@ Start-Process $winobjPath
 
 Write-Host "NOTE: Go to **Sessions -> 0**, expand **Dos Devices.** Then click on **EVERY folder** you see in **Dos Devices**." -ForegroundColor Yellow
 
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
