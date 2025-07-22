@@ -238,7 +238,7 @@ if ($usbExe) {
     Write-Host "ERROR: USBDeview.exe not found!" -ForegroundColor Red
 }
 
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
@@ -248,7 +248,7 @@ Write-Host "=== Registry Check ===" -ForegroundColor Cyan
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
 Start-Process regedit.exe
 Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
@@ -279,11 +279,29 @@ $procexpPath = "$env:TEMP\procexp.exe"
 Write-Host "Downloading Process Explorer..." -ForegroundColor Green
 Invoke-WebRequest -Uri $procexpUrl -OutFile $procexpPath
 
-Write-Host "Launching Process Explorer... | Wait For Process Explorer to Open" -ForegroundColor Green
+Write-Host "Launching Process Explorer..." -ForegroundColor Green
 Start-Process $procexpPath
 
 Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
 
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
+
+# --- Win OBJ ---
+Write-Host "=== WIN OBJ ===" -ForegroundColor Cyan
+
+$winobjUrl = "https://live.sysinternals.com/Winobj.exe"
+$winobjPath = "$env:TEMP\Winobj.exe"
+
+Write-Host "Downloading WinObj..." -ForegroundColor Green
+Invoke-WebRequest -Uri $winobjUrl -OutFile $winobjPath
+
+Write-Host "Launching WinObj..." -ForegroundColor Green
+Start-Process $winobjPath
+
+Write-Host "NOTE: Go to **Sessions -> 0**, expand **Dos Devices.** Then click on **EVERY folder** you see in **Dos Devices**." -ForegroundColor Yellow
+
+Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
