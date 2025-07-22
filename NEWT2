@@ -3,7 +3,7 @@ Write-Host @"
 | |   |  _  /  __ \ | ___ \  ___/  __ \  _  | ___ \  _  \_   _| \ | |  __ \ | ___ \  _  | |   |_   _/  __ \ \ / /
 | |   | | | | /  \/ | |_/ / |__ | /  \/ | | | |_/ / | | | | | |  \| | |  \/ | |_/ / | | | |     | | | /  \/\ V /
 | |   | | | | |     |    /|  __|| |   | | | |    /| | | | | | | .  | | __  |  __/| | | | |     | | | |     \ /
-| |___\ \_/ / \__/\ | |\ \| |___| \__/\ \_/ / |\ \| |/ / _| |_| |\  | |_\ \ | |   \ \_/ / |_____| |_| \__/\ | |
+| |___\ \_/ / \__/\ | |\ \| |___| \__/\ \_/ / |\ \| |/ / _| |_| |\  | |\_\ \ | |   \ \_/ / |_____| |_| \__/\ | |
 \_____/\___/ \____/ \_| \_\____/ \____/\___/\_| \_|___/  \___/\_| \_/\____/ \_|    \___/\_____/\___/ \____/ \_/
 
 Made by @enduremysoul & @justvalkz | discord.gg/locx / discord.gg/locjd
@@ -137,7 +137,6 @@ try {
 }
 
 $restoredThreats = @()
-
 foreach ($event in $events) {
     $xml = [xml]$event.ToXml()
     $eventID = $xml.Event.System.EventID
@@ -161,8 +160,7 @@ if ($restoredThreats.Count -eq 0) {
     }
 }
 
-# --- Press Enter to Continue ---
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
@@ -204,17 +202,16 @@ if ($recentExecutions.Count -eq 0) {
     }
 }
 
-# --- Press Enter to Continue (After Prefetch) ---
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
 # --- BAM Check ---
 Write-Host "=== BAM Check ===" -ForegroundColor Cyan
+Write-Host "NOTE: Scroll all the way down when opened." -ForegroundColor Yellow
 iex (iwr "https://raw.githubusercontent.com/2Krxzy/BAM/refs/heads/main/BAM")
 
-# --- Wait for User to Continue ---
-Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
@@ -240,3 +237,53 @@ if ($usbExe) {
 } else {
     Write-Host "ERROR: USBDeview.exe not found!" -ForegroundColor Red
 }
+
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
+
+# --- Registry Check ---
+Write-Host "=== Registry Check ===" -ForegroundColor Cyan
+
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
+Start-Process regedit.exe
+Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
+Start-Process regedit.exe
+Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
+Start-Process regedit.exe
+Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
+Start-Process regedit.exe
+Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+Write-Host "`nPress Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
+
+# --- Process Explorer ---
+Write-Host "=== Process Explorer ===" -ForegroundColor Cyan
+
+$procexpUrl = "https://live.sysinternals.com/procexp.exe"
+$procexpPath = "$env:TEMP\procexp.exe"
+
+Write-Host "Downloading Process Explorer..." -ForegroundColor Green
+Invoke-WebRequest -Uri $procexpUrl -OutFile $procexpPath
+
+Write-Host "Launching Process Explorer... | Wait For Process Explorer to Open" -ForegroundColor Green
+Start-Process $procexpPath
+
+Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
