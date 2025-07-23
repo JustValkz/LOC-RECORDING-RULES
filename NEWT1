@@ -1,0 +1,167 @@
+# ASCII Art Header in Cyan
+Write-Host @"
+| |   |  _  /  __ \ | ___ \  ___/  __ \  _  | ___ \  _  \_   _| \ | |  __ \ | ___ \  _  | |   |_   _/  __ \ \ / /
+| |   | | | | /  \/ | |_/ / |__ | /  \/ | | | |_/ / | | | | | |  \| | |  \/ | |_/ / | | | |     | | | /  \/\ V /
+| |   | | | | |     |    /|  __|| |   | | | |    /| | | | | | | .  | | __  |  __/| | | | |     | | | |     \ /
+| |___\ \_/ / \__/\ | |\ \| |___| \__/\ \_/ / |\ \| |/ / _| |_| |\  | |_\ \ | |   \ \_/ / |_____| |_| \__/\ | |
+\_____/\___/ \____/ \_| \_\____/ \____/\___/\_| \_|___/  \___/\_| \_/\____/ \_|    \___/\_____/\___/ \____/ \_/
+
+Made by @enduremysoul | discord.gg/locx / discord.gg/locjd
+"@ -ForegroundColor Cyan
+
+# --- Memory Integrity Check ---
+Write-Host "--- Memory Integrity ---" -ForegroundColor White
+$memIntegrityPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity'
+$memIntegrity = Get-ItemProperty -Path $memIntegrityPath -Name "Enabled" -ErrorAction SilentlyContinue
+
+if ($memIntegrity.Enabled -eq 1) {
+    Write-Host "SUCCESS: Memory Integrity supported." -ForegroundColor Green
+    Write-Host "SUCCESS: Memory Integrity is ON." -ForegroundColor Green
+} else {
+    Write-Host "FAIL: Memory Integrity unsupported or OFF." -ForegroundColor Red
+}
+
+# --- Windows Defender Real-time Protection Check ---
+Write-Host "--- Windows Defender ---" -ForegroundColor White
+$realTimeDisabled = (Get-MpPreference).DisableRealtimeMonitoring
+if ($realTimeDisabled) {
+    Write-Host "FAIL: Realtime protection is OFF." -ForegroundColor Red
+} else {
+    Write-Host "SUCCESS: Realtime protection is ON." -ForegroundColor Green
+}
+
+# --- Defender Exclusions Check ---
+Write-Host "--- Exclusions ---" -ForegroundColor White
+$excl = @()
+$pref = Get-MpPreference
+if ($pref.ExclusionProcess) { $excl += $pref.ExclusionProcess }
+if ($pref.ExclusionPath) { $excl += $pref.ExclusionPath }
+if ($pref.ExclusionExtension) { $excl += $pref.ExclusionExtension }
+
+if ($excl.Count -eq 0) {
+    Write-Host "SUCCESS: No Defender exclusions set." -ForegroundColor Green
+} else {
+    Write-Host "WARNING: Defender exclusions are set." -ForegroundColor Yellow
+}
+
+# --- Active Allowed Threats Check ---
+Write-Host "--- Allowed Threats ---" -ForegroundColor White
+
+$allowedThreats = Get-MpThreatDetection | Where-Object {
+    ($_.ThreatStatus -eq "Allowed" -or $_.ThreatStatus -eq "AllowedByUser") -and
+    ($_.Resources -and $_.Resources.Count -gt 0)
+}
+
+if (!$allowedThreats -or $allowedThreats.Count -eq 0) {
+    Write-Host "SUCCESS: No active allowed threats." -ForegroundColor Green
+} else {
+    Write-Host "WARNING: Active allowed threats detected!" -ForegroundColor Red
+}
+
+# --- Restored Threats Check (Event Logs, past 7 days) ---
+Write-Host "--- Restored Threats (past 7 days) ---" -ForegroundColor White
+
+$sevenDaysAgo = (Get-Date).AddDays(-7)
+
+try {
+    $events = Get-WinEvent -FilterHashtable @{
+        LogName   = 'Microsoft-Windows-Windows Defender/Operational'
+        StartTime = $sevenDaysAgo
+    } -ErrorAction Stop
+} catch {
+    Write-Host "ERROR: Could not access Defender event log. Run as Administrator?" -ForegroundColor Red
+    return
+}
+
+$restoredThreats = @()
+
+foreach ($event in $events) {
+    $xml = [xml]$event.ToXml()
+    $eventID = $xml.Event.System.EventID
+
+    if ($eventID -eq 1009 -or $xml.InnerXml -like "*restored*") {
+        $threatName = $xml.Event.EventData.Data | Where-Object { $_.Name -match 'ThreatName|Name' } | Select-Object -ExpandProperty '#text' -ErrorAction SilentlyContinue
+        if ($threatName) {
+            $restoredThreats += $threatName
+        } else {
+            $restoredThreats += $event.Message
+        }
+    }
+}
+
+if ($restoredThreats.Count -eq 0) {
+    Write-Host "SUCCESS: No restored threats in the past 7 days." -ForegroundColor Green
+} else {
+    Write-Host "WARNING: Restored threats found in the past 7 days:" -ForegroundColor Yellow
+    $restoredThreats | Sort-Object -Unique | ForEach-Object {
+        Write-Host " - $_" -ForegroundColor Yellow
+    }
+}
+
+# --- Press Enter to Continue ---
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
+
+# --- Check if running as Administrator ---
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Warning "This script must be run as Administrator. Exiting..."
+    exit
+}
+
+# --- Prefetch Recent Executions (last 24 hours) ---
+$prefetchPath = "$env:SystemRoot\Prefetch"
+$cutoffTime = (Get-Date).AddHours(-24)
+
+$prefetchFiles = Get-ChildItem -Path $prefetchPath -Filter *.pf -ErrorAction SilentlyContinue
+
+$recentExecutions = @()
+
+foreach ($file in $prefetchFiles) {
+    $lastRunTime = $file.LastAccessTime
+    if ($lastRunTime -ge $cutoffTime) {
+        $exeName = $file.BaseName -replace "-.*", ".exe"
+        $hoursAgo = [math]::Round(((Get-Date) - $lastRunTime).TotalHours, 2)
+
+        $recentExecutions += [PSCustomObject]@{
+            ExeName     = $exeName
+            LastRunTime = $lastRunTime
+            HoursAgo    = $hoursAgo
+        }
+    }
+}
+
+$recentExecutions = $recentExecutions | Sort-Object LastRunTime
+
+Clear-Host
+
+if ($recentExecutions.Count -eq 0) {
+    Write-Host "No recent prefetch executions in the last 24 hours." -ForegroundColor Green
+} else {
+    Write-Host "--- Recent Prefetch Executions (last 24 hours) ---" -ForegroundColor White
+    foreach ($entry in $recentExecutions) {
+        Write-Output "$($entry.ExeName) | Last Run: $($entry.LastRunTime) | $($entry.HoursAgo) hours ago"
+    }
+}
+
+# --- Press Enter to Continue ---
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
+
+# --- Resource Monitor ---
+Write-Host "--- Resource Monitor ---" -ForegroundColor Cyan
+
+$perfmonPath = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Resource Monitor.lnk"
+
+if (Test-Path $perfmonPath) {
+    Start-Process $perfmonPath
+    Write-Host "Launching Resource Monitor..." -ForegroundColor Green
+    Write-Host "NOTE: Scroll down in all sections on top including Overview, CPU, Memory, and Network." -ForegroundColor Yellow
+} else {
+    Write-Host "ERROR: Could not find perfmon.exe at expected path." -ForegroundColor Red
+}
+
+# --- Press Enter to Continue ---
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
