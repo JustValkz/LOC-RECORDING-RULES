@@ -157,7 +157,7 @@ $perfmonPath = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrat
 if (Test-Path $perfmonPath) {
     Start-Process $perfmonPath
     Write-Host "Launching Resource Monitor..." -ForegroundColor Green
-    Write-Host "NOTE: Scroll down in all sections on top including Overview, CPU, Memory, and Network." -ForegroundColor Yellow
+    Write-Host "NOTE: **Full screen**, navigate to **Overview** and **Scroll Down**, then navigate to **CPU** and **scroll all the way down**." -ForegroundColor Yellow
 } else {
     Write-Host "ERROR: Could not find perfmon.exe at expected path." -ForegroundColor Red
 }
