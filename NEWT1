@@ -30,18 +30,64 @@ if ($realTimeDisabled) {
     Write-Host "SUCCESS: Realtime protection is ON." -ForegroundColor Green
 }
 
-# --- Defender Exclusions Check ---
+# --- Defender Exclusions Check (including registry keys) ---
 Write-Host "--- Exclusions ---" -ForegroundColor White
+
 $excl = @()
 $pref = Get-MpPreference
+
+# Built-in exclusions from MpPreference
 if ($pref.ExclusionProcess) { $excl += $pref.ExclusionProcess }
 if ($pref.ExclusionPath) { $excl += $pref.ExclusionPath }
 if ($pref.ExclusionExtension) { $excl += $pref.ExclusionExtension }
+
+# Additional registry-based exclusions
+$registryExcl = @()
+$exclusionRegistryPaths = @(
+    'HKLM:\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths',
+    'HKLM:\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths',
+    'HKLM:\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes'
+)
+
+foreach ($regPath in $exclusionRegistryPaths) {
+    try {
+        $item = Get-Item -Path $regPath -ErrorAction Stop
+        # Use .GetValueNames() to get explicit values (handles if registry values are empty strings etc.)
+        $baseKey = $item.PSPath -replace '^Microsoft.PowerShell.Core\\Registry::', ''
+        $rawKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($baseKey.Substring(5))  # Remove HKLM: prefix to match .NET path
+        if ($rawKey) {
+            $valueNames = $rawKey.GetValueNames()
+            foreach ($name in $valueNames) {
+                $val = $rawKey.GetValue($name)
+                # For Paths/TemporaryPaths the name is usually the path; for Processes the name is the process
+                # Normalize: if value is null/empty, use the name; else include both for context
+                if ([string]::IsNullOrEmpty($val)) {
+                    $registryExcl += $name
+                } else {
+                    $registryExcl += "$name : $val"
+                }
+            }
+            $rawKey.Close()
+        }
+    } catch {
+        # Key missing or inaccessible; ignore
+    }
+}
+
+if ($registryExcl.Count -gt 0) {
+    $excl += $registryExcl
+}
+
+# Deduplicate
+$excl = $excl | Sort-Object -Unique
 
 if ($excl.Count -eq 0) {
     Write-Host "SUCCESS: No Defender exclusions set." -ForegroundColor Green
 } else {
     Write-Host "WARNING: Defender exclusions are set." -ForegroundColor Yellow
+    foreach ($e in $excl) {
+        Write-Host " - $e" -ForegroundColor Yellow
+    }
 }
 
 # --- Active Allowed Threats Check ---
