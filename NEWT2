@@ -257,6 +257,18 @@ Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor
 Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
+Start-Process regedit.exe
+Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
+Start-Process regedit.exe
+Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
 Start-Process regedit.exe
 Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
