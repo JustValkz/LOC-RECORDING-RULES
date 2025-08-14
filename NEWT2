@@ -381,19 +381,13 @@ Write-Host "Press 'N' to stop the script" -ForegroundColor Magenta
 $allowedApps = @(
     "chrome","opera","discord","Bloxstrap","RobloxPlayerBeta",
     "RobloxStudio","Spotify","Lightshot","Logitech Ghub","lghub",
-    "Razor","Steelseries","Glorious","lghub_agent","lghub_system_tray","lghub_updater"
-)
-
-$systemProcesses = @(
-    "explorer","winlogon","csrss","services","lsass","smss",
-    "dwm","svchost","taskmgr","regedit","resmon","cmd","powershell"
+    "Razor","Steelseries","Glorious","lghub_agent","lghub_system_tray",
+    "lghub_updater","msedge"
 )
 
 $stopScript = $false
 
-# Main monitoring loop with key listener
 while (-not $stopScript) {
-    # Check for key press
     if ([console]::KeyAvailable) {
         $key = [console]::ReadKey($true)
         if ($key.Key -eq "N") {
@@ -410,23 +404,28 @@ while (-not $stopScript) {
         }
     }
 
-    # Process monitoring
     $processes = Get-Process | Sort-Object Name -Unique
     foreach ($proc in $processes) {
         try {
             $procName = $proc.ProcessName
+
+            # Skip allowed apps
             if ($allowedApps -contains $procName) { continue }
-            if ($systemProcesses -contains $procName) { continue }
-            if ($proc.Path -and $proc.Path -like "C:\Windows\System32\*") { continue }
-            if (-not $proc.Path) { continue }
+
+            # Skip processes running anywhere in C:\Windows or C:\ProgramData
+            if ($proc.Path -and ($proc.Path -like "C:\Windows\*" -or $proc.Path -like "C:\ProgramData\*")) { continue }
+
+            # Skip Windows Services
+            if ($proc.StartType -eq "Service") { continue }
 
             Write-Host "Closing process: $procName ($($proc.Id))" -ForegroundColor Yellow
-            Stop-Process -Id $proc.Id -Force
+            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
         }
         catch {
-            Write-Host "Could not close process: $($proc.ProcessName)" -ForegroundColor Red
+            Write-Host "Could not close process: $($proc.ProcessName) (Access denied or protected)" -ForegroundColor Red
         }
     }
+
     Start-Sleep -Seconds 2
 }
 
