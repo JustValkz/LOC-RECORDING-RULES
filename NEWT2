@@ -332,15 +332,40 @@ Clear-Host
 
 # --- Deleting External Packages ---
 Write-Host "=== Deleting External Packages ===" -ForegroundColor Cyan
-$patterns = "Microsoft Visual C++","DirectX"
-$keys = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*","HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
-foreach ($k in $keys) {
-    Get-ItemProperty $k | Where-Object { $_.DisplayName -and ($patterns | Where-Object { $_.DisplayName -like "*$_*" }) } |
+
+# Define search patterns
+$patterns = @(
+    "Microsoft Visual C++",
+    "DirectX"
+)
+
+# Paths to check (32-bit and 64-bit uninstall keys)
+$uninstallPaths = @(
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
+    "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+)
+
+foreach ($path in $uninstallPaths) {
+    Get-ItemProperty $path |
+    Where-Object {
+        $name = $_.DisplayName
+        $name -and ($patterns | ForEach-Object { $name -like "*$_*" }) -contains $true
+    } |
     ForEach-Object {
         Write-Host "Uninstalling $($_.DisplayName)..." -ForegroundColor Yellow
-        $id=$_.PSChildName; $cmd=$_.UninstallString
-        if ($id -match "^\{.*\}$") { Start-Process msiexec "/x $id /quiet /norestart" -Wait }
-        elseif ($cmd) { Start-Process cmd "/c $cmd /quiet /norestart" -Wait }
+        if ($_.PSChildName -match "^\{.*\}$") {
+            # GUID-based uninstall
+            Start-Process "msiexec.exe" -ArgumentList "/x $($_.PSChildName) /quiet /norestart" -Wait
+        }
+        elseif ($_.UninstallString) {
+            # Direct uninstall string
+            $cmd = $_.UninstallString
+            # Ensure silent uninstall if possible
+            if ($cmd -notmatch "/quiet" -and $cmd -notmatch "/qn") {
+                $cmd += " /quiet /norestart"
+            }
+            Start-Process "cmd.exe" -ArgumentList "/c $cmd" -Wait
+        }
     }
 }
 [void][System.Console]::ReadLine()
