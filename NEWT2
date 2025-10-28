@@ -18,20 +18,19 @@ if ($env:OS -ne "Windows_NT") {
     Write-Host "SUCCESS: Running on Windows." -ForegroundColor Green
 }
 
-# --- GPU Check (NVIDIA Detection) ---
-Write-Host "--- GPU Check (NVIDIA) ---" -ForegroundColor White
+# --- GPU Check ---
+Write-Host "--- GPU Check ---" -ForegroundColor White
 try {
-    $gpus = Get-WmiObject Win32_VideoController
-    $nvidiaGpus = $gpus | Where-Object { $_.Name -like "*NVIDIA*" }
+    $gpu = Get-CimInstance Win32_VideoController | Select-Object -First 1
+    $gpuName = $gpu.Name
 
-    if ($nvidiaGpus.Count -gt 0) {
-        Write-Host "SUCCESS: NVIDIA GPU detected:" -ForegroundColor Green
-        $nvidiaGpus | ForEach-Object { Write-Host " - $($_.Name)" -ForegroundColor Green }
+    if ($gpuName) {
+        Write-Host "Detected GPU: $gpuName" -ForegroundColor Green
     } else {
-        Write-Host "INFO: No NVIDIA GPU found." -ForegroundColor Yellow
+        Write-Host "No GPU detected." -ForegroundColor Green
     }
 } catch {
-    Write-Host "ERROR: Could not check GPU information." -ForegroundColor Red
+    Write-Host "ERROR: Could not detect GPU information." -ForegroundColor Green
 }
 
 # --- Windows PowerShell Check ---
