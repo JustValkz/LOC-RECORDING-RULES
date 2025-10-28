@@ -6,7 +6,7 @@ Write-Host @"
 | |___\ \_/ / \__/\ | |\ \| |___| \__/\ \_/ / |\ \| |/ / _| |_| |\  | |_\ \ | |   \ \_/ / |_____| |_| \__/\ | |
 \_____/\___/ \____/ \_| \_\____/ \____/\___/\_| \_|___/  \___/\_| \_/\____/ \_|    \___/\_____/\___/ \____/ \_/
 Made by @yusuf.quadri | discord.gg/locx / discord.gg/locjd
-Tier 1 Recording Policy 
+Tier 2 Recording Policy 
 "@ -ForegroundColor Cyan 
 
 # --- Instruction Block ---
