@@ -5,37 +5,20 @@ Write-Host @"
 | |   | | | | |     |    /|  __|| |   | | | |    /| | | | | | | .  | | __  |  __/| | | | |     | | | |     \ /
 | |___\ \_/ / \__/\ | |\ \| |___| \__/\ \_/ / |\ \| |/ / _| |_| |\  | |_\ \ | |   \ \_/ / |_____| |_| \__/\ | |
 \_____/\___/ \____/ \_| \_\____/ \____/\___/\_| \_|___/  \___/\_| \_/\____/ \_|    \___/\_____/\___/ \____/ \_/
+Made by @yusuf.quadri | discord.gg/locx / discord.gg/locjd
+Tier 1 Recording Policy 
+"@ -ForegroundColor Cyan 
 
-Made by @enduremysoul | discord.gg/locx / discord.gg/locjd
-"@ -ForegroundColor Cyan
-
-# Function: Registry navigation prompt
-function Show-RegistryKey {
-    param (
-      [string]$RegPath,
-      [string]$PromptMessage = "Press Enter to Continue..."
-    )
-
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value $RegPath
-    Start-Process regedit.exe
-    Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-    Write-Host $PromptMessage -ForegroundColor Cyan
-    [void][System.Console]::ReadLine()
-}
-
-# --- Registry Check: open several keys for manual review ---
-Write-Host "=== Registry Check ===" -ForegroundColor Cyan
-
-Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
-Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
-Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
-Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
-Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
-Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
-
+# --- Instruction Block ---
+Write-Host ""
+Write-Host "Must ensure that result is SUCCESS and follow instructions to ensure a valid recording." -ForegroundColor Yellow 
+Write-Host "You have 24H to send your recording in the JD Server." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "Press Enter to continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
 Clear-Host
 
-# --- Memory Integrity Check ---
+# --- Section 1: Memory + Defender + Threats + GPU ---
 Write-Host "--- Memory Integrity ---" -ForegroundColor White
 $memIntegrityPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity'
 $memIntegrity = Get-ItemProperty -Path $memIntegrityPath -Name "Enabled" -ErrorAction SilentlyContinue
@@ -47,7 +30,7 @@ if ($memIntegrity.Enabled -eq 1) {
     Write-Host "FAIL: Memory Integrity unsupported or OFF." -ForegroundColor Red
 }
 
-# --- Windows Defender Real-time Protection Check ---
+# --- Windows Defender Checks ---
 Write-Host "--- Windows Defender ---" -ForegroundColor White
 $realTimeDisabled = (Get-MpPreference).DisableRealtimeMonitoring
 if ($realTimeDisabled) {
@@ -56,12 +39,10 @@ if ($realTimeDisabled) {
     Write-Host "SUCCESS: Realtime protection is ON." -ForegroundColor Green
 }
 
-# --- Defender Exclusions Check ---
+# --- Exclusions ---
 Write-Host "--- Exclusions ---" -ForegroundColor White
-
 $excl = @()
 $pref = Get-MpPreference
-
 if ($pref.ExclusionProcess) { $excl += $pref.ExclusionProcess }
 if ($pref.ExclusionPath) { $excl += $pref.ExclusionPath }
 if ($pref.ExclusionExtension) { $excl += $pref.ExclusionExtension }
@@ -90,34 +71,24 @@ foreach ($regPath in $exclusionRegistryPaths) {
             }
             $rawKey.Close()
         }
-    } catch {
-        # ignore if key not present
-    }
+    } catch {}
 }
 
-if ($registryExcl.Count -gt 0) {
-    $excl += $registryExcl
-}
-
+if ($registryExcl.Count -gt 0) { $excl += $registryExcl }
 $excl = $excl | Sort-Object -Unique
-
 if ($excl.Count -eq 0) {
     Write-Host "SUCCESS: No Defender exclusions set." -ForegroundColor Green
 } else {
     Write-Host "WARNING: Defender exclusions are set." -ForegroundColor Yellow
-    foreach ($e in $excl) {
-        Write-Host " - $e" -ForegroundColor Yellow
-    }
+    foreach ($e in $excl) { Write-Host " - $e" -ForegroundColor Yellow }
 }
 
-# --- Active Allowed Threats Check ---
+# --- Allowed Threats ---
 Write-Host "--- Allowed Threats ---" -ForegroundColor White
-
 $allowedThreats = Get-MpThreatDetection | Where-Object {
     ($_.ThreatStatus -eq "Allowed" -or $_.ThreatStatus -eq "AllowedByUser") -and
     ($_.Resources -and $_.Resources.Count -gt 0)
 }
-
 if (!$allowedThreats -or $allowedThreats.Count -eq 0) {
     Write-Host "SUCCESS: No active allowed threats." -ForegroundColor Green
 } else {
@@ -127,8 +98,8 @@ if (!$allowedThreats -or $allowedThreats.Count -eq 0) {
     }
 }
 
-# --- Restored Threats in Event Log (last 7 days) ---
-Write-Host "--- Restored Threats (past 7 days) ---" -ForegroundColor White
+# --- Restored Threats & GPU Check ---
+Write-Host "--- Restored Threats (past 7 days) & GPU Check ---" -ForegroundColor White
 $sevenDaysAgo = (Get-Date).AddDays(-7)
 try {
     $events = Get-WinEvent -FilterHashtable @{
@@ -148,11 +119,7 @@ foreach ($event in $events) {
         $threatName = $xml.Event.EventData.Data |
             Where-Object { $_.Name -match 'ThreatName|Name' } |
             Select-Object -ExpandProperty '#text' -ErrorAction SilentlyContinue
-        if ($threatName) {
-            $restoredThreats += $threatName
-        } else {
-            $restoredThreats += $event.Message
-        }
+        if ($threatName) { $restoredThreats += $threatName } else { $restoredThreats += $event.Message }
     }
 }
 
@@ -160,23 +127,55 @@ if ($restoredThreats.Count -eq 0) {
     Write-Host "SUCCESS: No restored threats in the past 7 days." -ForegroundColor Green
 } else {
     Write-Host "WARNING: Restored threats found in the past 7 days:" -ForegroundColor Yellow
-    $restoredThreats | Sort-Object -Unique | ForEach-Object {
-        Write-Host " - $_" -ForegroundColor Yellow
-    }
+    $restoredThreats | Sort-Object -Unique | ForEach-Object { Write-Host " - $_" -ForegroundColor Yellow }
 }
 
-# --- Pause & Clear ---
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+# --- GPU Info ---
+try {
+    $gpu = Get-CimInstance Win32_VideoController | Select-Object -First 1
+    $gpuName = $gpu.Name
+    Write-Host "Detected GPU: $gpuName" -ForegroundColor Green
+} catch {
+    Write-Host "No GPU detected or error retrieving info." -ForegroundColor Green
+}
+
+# --- Pause before Section 2 ---
+Write-Host ""
+Write-Host "Press Enter to continue to Section 2..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
-# --- Check if running as Administrator ---
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Warning "This script must be run as Administrator. Exiting..."
-    exit
+# --- Section 2 Header & List ---
+Write-Host "=== SECTION 2 ===" -ForegroundColor Cyan
+Write-Host "Sections:" -ForegroundColor White
+Write-Host "1. Memory & Defender Checks (Completed)" -ForegroundColor Green
+Write-Host "2. Registry Check, Prefetch & Resource Monitor (Current)" -ForegroundColor Yellow
+Write-Host ""
+
+# --- Section 2: Registry Check ---
+function Show-RegistryKey {
+    param (
+      [string]$RegPath,
+      [string]$PromptMessage = "Press Enter to Continue..."
+    )
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value $RegPath
+    Start-Process regedit.exe
+    Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+    Write-Host $PromptMessage -ForegroundColor Cyan
+    [void][System.Console]::ReadLine()
 }
 
-# --- Prefetch Recent Executions (last 24 hours) ---
+Write-Host "=== Registry Check ===" -ForegroundColor Cyan
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
+Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
+Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
+
+Clear-Host
+
+# --- Prefetch Recent Executions ---
 $prefetchPath = "$env:SystemRoot\Prefetch"
 $cutoffTime = (Get-Date).AddHours(-24)
 $prefetchFiles = Get-ChildItem -Path $prefetchPath -Filter *.pf -ErrorAction SilentlyContinue
@@ -204,21 +203,21 @@ if ($recentExecutions.Count -eq 0) {
     }
 }
 
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+Write-Host "Press Enter to continue to Resource Monitor..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
-# --- Resource Monitor --- 
+# --- Open Resource Monitor ---
 Write-Host "--- Resource Monitor ---" -ForegroundColor Cyan
 $perfmonPath = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Resource Monitor.lnk"
 if (Test-Path $perfmonPath) {
     Start-Process $perfmonPath
     Write-Host "Launching Resource Monitor..." -ForegroundColor Green
-    Write-Host "NOTE: **Full screen**, navigate to **Overview** and **Scroll Down**, then navigate to **CPU** and scroll all the way down." -ForegroundColor Yellow
+    Write-Host "NOTE: **Full screen**, navigate to **Overview** and scroll all the way down, then navigate to **CPU** and scroll all the way down." -ForegroundColor Yellow
 } else {
     Write-Host "ERROR: Could not find Resource Monitor shortcut." -ForegroundColor Red
 }
 
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
-Write-Host "Powershell Script finished" -ForegroundColor Green
+Write-Host "Press Enter to finish the script..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
+Write-Host "Powershell Script finished" -ForegroundColor Green
