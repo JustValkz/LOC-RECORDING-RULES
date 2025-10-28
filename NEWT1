@@ -98,7 +98,7 @@ if (!$allowedThreats -or $allowedThreats.Count -eq 0) {
     }
 }
 
-# --- Restored Threats & GPU Check ---
+# --- Restored Threats ---
 Write-Host "--- Restored Threats (past 7 days) & GPU Check ---" -ForegroundColor White
 $sevenDaysAgo = (Get-Date).AddDays(-7)
 try {
@@ -131,6 +131,8 @@ if ($restoredThreats.Count -eq 0) {
 }
 
 # --- GPU Info ---
+Write-Host "--- GPU Check ---" -ForegroundColor White
+
 try {
     $gpu = Get-CimInstance Win32_VideoController | Select-Object -First 1
     $gpuName = $gpu.Name
