@@ -221,3 +221,4 @@ if (Test-Path $perfmonPath) {
 
 Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
+Write-Host "Powershell Script finished" -ForegroundColor Green
