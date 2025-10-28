@@ -327,6 +327,5 @@ Start-Process resmon.exe
 Write-Host "NOTE: **Full screen**, navigate to **Overview** and **Scroll Down**, then navigate to **CPU** and **scroll all the way down**." -ForegroundColor Yellow
 
 Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
-[void][System.Console]::ReadLine()
-Clear-Host
 Write-Host "Powershell Script finished" -ForegroundColor Green
+[void][System.Console]::ReadLine()
