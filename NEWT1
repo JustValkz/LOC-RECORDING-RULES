@@ -1,4 +1,4 @@
-# ASCII Art Header in Cyan
+# --- ASCII Art Header in Cyan ---
 Write-Host @"
 | |   |  _  /  __ \ | ___ \  ___/  __ \  _  | ___ \  _  \_   _| \ | |  __ \ | ___ \  _  | |   |_   _/  __ \ \ / /
 | |   | | | | /  \/ | |_/ / |__ | /  \/ | | | |_/ / | | | | | |  \| | |  \/ | |_/ / | | | |     | | | /  \/\ V /
@@ -8,6 +8,32 @@ Write-Host @"
 
 Made by @enduremysoul | discord.gg/locx / discord.gg/locjd
 "@ -ForegroundColor Cyan
+
+# Function: Registry navigation prompt
+function Show-RegistryKey {
+    param (
+      [string]$RegPath,
+      [string]$PromptMessage = "Press Enter to Continue..."
+    )
+
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value $RegPath
+    Start-Process regedit.exe
+    Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+    Write-Host $PromptMessage -ForegroundColor Cyan
+    [void][System.Console]::ReadLine()
+}
+
+# --- Registry Check: open several keys for manual review ---
+Write-Host "=== Registry Check ===" -ForegroundColor Cyan
+
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
+Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
+Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
+
+Clear-Host
 
 # --- Memory Integrity Check ---
 Write-Host "--- Memory Integrity ---" -ForegroundColor White
@@ -30,18 +56,16 @@ if ($realTimeDisabled) {
     Write-Host "SUCCESS: Realtime protection is ON." -ForegroundColor Green
 }
 
-# --- Defender Exclusions Check (including registry keys) ---
+# --- Defender Exclusions Check ---
 Write-Host "--- Exclusions ---" -ForegroundColor White
 
 $excl = @()
 $pref = Get-MpPreference
 
-# Built-in exclusions from MpPreference
 if ($pref.ExclusionProcess) { $excl += $pref.ExclusionProcess }
 if ($pref.ExclusionPath) { $excl += $pref.ExclusionPath }
 if ($pref.ExclusionExtension) { $excl += $pref.ExclusionExtension }
 
-# Additional registry-based exclusions
 $registryExcl = @()
 $exclusionRegistryPaths = @(
     'HKLM:\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths',
@@ -52,15 +76,12 @@ $exclusionRegistryPaths = @(
 foreach ($regPath in $exclusionRegistryPaths) {
     try {
         $item = Get-Item -Path $regPath -ErrorAction Stop
-        # Use .GetValueNames() to get explicit values (handles if registry values are empty strings etc.)
         $baseKey = $item.PSPath -replace '^Microsoft.PowerShell.Core\\Registry::', ''
-        $rawKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($baseKey.Substring(5))  # Remove HKLM: prefix to match .NET path
+        $rawKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($baseKey.Substring(5))
         if ($rawKey) {
             $valueNames = $rawKey.GetValueNames()
             foreach ($name in $valueNames) {
                 $val = $rawKey.GetValue($name)
-                # For Paths/TemporaryPaths the name is usually the path; for Processes the name is the process
-                # Normalize: if value is null/empty, use the name; else include both for context
                 if ([string]::IsNullOrEmpty($val)) {
                     $registryExcl += $name
                 } else {
@@ -70,7 +91,7 @@ foreach ($regPath in $exclusionRegistryPaths) {
             $rawKey.Close()
         }
     } catch {
-        # Key missing or inaccessible; ignore
+        # ignore if key not present
     }
 }
 
@@ -78,7 +99,6 @@ if ($registryExcl.Count -gt 0) {
     $excl += $registryExcl
 }
 
-# Deduplicate
 $excl = $excl | Sort-Object -Unique
 
 if ($excl.Count -eq 0) {
@@ -102,13 +122,14 @@ if (!$allowedThreats -or $allowedThreats.Count -eq 0) {
     Write-Host "SUCCESS: No active allowed threats." -ForegroundColor Green
 } else {
     Write-Host "WARNING: Active allowed threats detected!" -ForegroundColor Red
+    $allowedThreats | ForEach-Object {
+        Write-Host " - $($_.ThreatName) / Status: $($_.ThreatStatus)" -ForegroundColor Red
+    }
 }
 
-# --- Restored Threats Check (Event Logs, past 7 days) ---
+# --- Restored Threats in Event Log (last 7 days) ---
 Write-Host "--- Restored Threats (past 7 days) ---" -ForegroundColor White
-
 $sevenDaysAgo = (Get-Date).AddDays(-7)
-
 try {
     $events = Get-WinEvent -FilterHashtable @{
         LogName   = 'Microsoft-Windows-Windows Defender/Operational'
@@ -116,17 +137,17 @@ try {
     } -ErrorAction Stop
 } catch {
     Write-Host "ERROR: Could not access Defender event log. Run as Administrator?" -ForegroundColor Red
-    return
+    exit
 }
 
 $restoredThreats = @()
-
 foreach ($event in $events) {
     $xml = [xml]$event.ToXml()
     $eventID = $xml.Event.System.EventID
-
     if ($eventID -eq 1009 -or $xml.InnerXml -like "*restored*") {
-        $threatName = $xml.Event.EventData.Data | Where-Object { $_.Name -match 'ThreatName|Name' } | Select-Object -ExpandProperty '#text' -ErrorAction SilentlyContinue
+        $threatName = $xml.Event.EventData.Data |
+            Where-Object { $_.Name -match 'ThreatName|Name' } |
+            Select-Object -ExpandProperty '#text' -ErrorAction SilentlyContinue
         if ($threatName) {
             $restoredThreats += $threatName
         } else {
@@ -144,7 +165,7 @@ if ($restoredThreats.Count -eq 0) {
     }
 }
 
-# --- Press Enter to Continue ---
+# --- Pause & Clear ---
 Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
@@ -158,17 +179,14 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # --- Prefetch Recent Executions (last 24 hours) ---
 $prefetchPath = "$env:SystemRoot\Prefetch"
 $cutoffTime = (Get-Date).AddHours(-24)
-
 $prefetchFiles = Get-ChildItem -Path $prefetchPath -Filter *.pf -ErrorAction SilentlyContinue
 
 $recentExecutions = @()
-
 foreach ($file in $prefetchFiles) {
     $lastRunTime = $file.LastAccessTime
     if ($lastRunTime -ge $cutoffTime) {
         $exeName = $file.BaseName -replace "-.*", ".exe"
         $hoursAgo = [math]::Round(((Get-Date) - $lastRunTime).TotalHours, 2)
-
         $recentExecutions += [PSCustomObject]@{
             ExeName     = $exeName
             LastRunTime = $lastRunTime
@@ -177,37 +195,29 @@ foreach ($file in $prefetchFiles) {
     }
 }
 
-$recentExecutions = $recentExecutions | Sort-Object LastRunTime
-
-Clear-Host
-
 if ($recentExecutions.Count -eq 0) {
     Write-Host "No recent prefetch executions in the last 24 hours." -ForegroundColor Green
 } else {
     Write-Host "--- Recent Prefetch Executions (last 24 hours) ---" -ForegroundColor White
-    foreach ($entry in $recentExecutions) {
+    foreach ($entry in $recentExecutions | Sort-Object LastRunTime) {
         Write-Output "$($entry.ExeName) | Last Run: $($entry.LastRunTime) | $($entry.HoursAgo) hours ago"
     }
 }
 
-# --- Press Enter to Continue ---
 Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
-# --- Resource Monitor ---
+# --- Resource Monitor --- 
 Write-Host "--- Resource Monitor ---" -ForegroundColor Cyan
-
 $perfmonPath = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Resource Monitor.lnk"
-
 if (Test-Path $perfmonPath) {
     Start-Process $perfmonPath
     Write-Host "Launching Resource Monitor..." -ForegroundColor Green
-    Write-Host "NOTE: **Full screen**, navigate to **Overview** and **Scroll Down**, then navigate to **CPU** and **scroll all the way down**." -ForegroundColor Yellow
+    Write-Host "NOTE: **Full screen**, navigate to **Overview** and **Scroll Down**, then navigate to **CPU** and scroll all the way down." -ForegroundColor Yellow
 } else {
-    Write-Host "ERROR: Could not find perfmon.exe at expected path." -ForegroundColor Red
+    Write-Host "ERROR: Could not find Resource Monitor shortcut." -ForegroundColor Red
 }
 
-# --- Press Enter to Continue ---
 Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
