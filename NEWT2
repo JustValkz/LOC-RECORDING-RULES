@@ -1,13 +1,22 @@
-# ASCII Art Header in Cyan
+# --- ASCII Art Header in Cyan ---
 Write-Host @"
 | |   |  _  /  __ \ | ___ \  ___/  __ \  _  | ___ \  _  \_   _| \ | |  __ \ | ___ \  _  | |   |_   _/  __ \ \ / /
 | |   | | | | /  \/ | |_/ / |__ | /  \/ | | | |_/ / | | | | | |  \| | |  \/ | |_/ / | | | |     | | | /  \/\ V /
 | |   | | | | |     |    /|  __|| |   | | | |    /| | | | | | | .  | | __  |  __/| | | | |     | | | |     \ /
-| |___\ \_/ / \__/\ | |\ \| |___| \__/\ \_/ / |\ \| |/ / _| |_| |\  | |\_\ \ | |   \ \_/ / |_____| |_| \__/\ | |
+| |___\ \_/ / \__/\ | |\ \| |___| \__/\ \_/ / |\ \| |/ / _| |_| |\  | |_\ \ | |   \ \_/ / |_____| |_| \__/\ | |
 \_____/\___/ \____/ \_| \_\____/ \____/\___/\_| \_|___/  \___/\_| \_/\____/ \_|    \___/\_____/\___/ \____/ \_/
+Made by @yusuf.quadri | discord.gg/locx / discord.gg/locjd
+Tier 1 Recording Policy 
+"@ -ForegroundColor Cyan 
 
-Made by @enduremysoul & @justvalkz | discord.gg/locx / discord.gg/locjd
-"@ -ForegroundColor Cyan
+# --- Instruction Block ---
+Write-Host ""
+Write-Host "Must ensure that result is SUCCESS and follow instructions to ensure a valid recording." -ForegroundColor Yellow 
+Write-Host "You have 24H to send your recording in the JD Server." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "Press Enter to continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+Clear-Host
 
 # --- OS Check ---
 Write-Host "--- OS Check ---" -ForegroundColor White
