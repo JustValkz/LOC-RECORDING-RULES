@@ -252,6 +252,7 @@ Clear-Host
 
 # --- Registry Check ---
 Write-Host "=== Registry Check ===" -ForegroundColor Cyan
+Write-Host "NOTE: Ensure to close the registry window after each step!!!" -ForegroundColor Yellow
 
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
 Start-Process regedit.exe
