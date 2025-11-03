@@ -163,6 +163,7 @@ function Show-RegistryKey {
     Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value $RegPath
     Start-Process regedit.exe
     Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+    Write-Host "NOTE: Close the registry window when finished for each step!!!" -ForegroundColor Yellow
     Write-Host $PromptMessage -ForegroundColor Cyan
     [void][System.Console]::ReadLine()
 }
