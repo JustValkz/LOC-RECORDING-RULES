@@ -254,40 +254,31 @@ Clear-Host
 Write-Host "=== Registry Check ===" -ForegroundColor Cyan
 Write-Host "NOTE: Ensure to close the registry window after each step!!!" -ForegroundColor Yellow
 
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
-Start-Process regedit.exe
-Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
-[void][System.Console]::ReadLine()
+function Show-RegistryKey {
+    param (
+      [string]$RegPath,
+      [string]$PromptMessage = "Press Enter to Continue..."
+    )
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value $RegPath
+    Start-Process regedit.exe
+    Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+    Write-Host $PromptMessage -ForegroundColor Cyan
+    [void][System.Console]::ReadLine()
+}
 
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
-Start-Process regedit.exe
-Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
-[void][System.Console]::ReadLine()
+Write-Host "=== Registry Check ===" -ForegroundColor Cyan
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Extensions"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\IpAddresses"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
+Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
+Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Threats\ThreatIDDefaultAction"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Threats\ThreatSeverityDefaultAction"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Threats\ThreatTypeDefaultAction"
 
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
-Start-Process regedit.exe
-Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
-[void][System.Console]::ReadLine()
-
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
-Start-Process regedit.exe
-Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
-[void][System.Console]::ReadLine()
-
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
-Start-Process regedit.exe
-Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
-[void][System.Console]::ReadLine()
-
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" -Name "LastKey" -Value "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
-Start-Process regedit.exe
-Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
-Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
 Clear-Host
 
