@@ -49,6 +49,7 @@ if ($pref.ExclusionExtension) { $excl += $pref.ExclusionExtension }
 
 $registryExcl = @()
 $exclusionRegistryPaths = @(
+    'HKLM:\SOFTWARE\Microsoft\Windows Defender\Exclusions\IpAddressess',
     'HKLM:\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths',
     'HKLM:\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths',
     'HKLM:\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes'
@@ -171,10 +172,16 @@ function Show-RegistryKey {
 Write-Host "=== Registry Check ===" -ForegroundColor Cyan
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\IpAddresses"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
 Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
 Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Threats\ThreatIDDefaultAction"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Threats\ThreatSeverityDefaultAction"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Threats\ThreatTypeDefaultAction"
+
+
 
 Clear-Host
 
