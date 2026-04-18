@@ -171,10 +171,10 @@ function Show-RegistryKey {
 
 Write-Host "=== Registry Check ===" -ForegroundColor Cyan
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
-Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\IpAddresses"
-Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\TemporaryPaths"
 Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched"
 Show-RegistryKey -RegPath "Computer\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Threats\ThreatIDDefaultAction"
@@ -227,6 +227,25 @@ if (Test-Path $perfmonPath) {
 } else {
     Write-Host "ERROR: Could not find Resource Monitor shortcut." -ForegroundColor Red
 }
+[void][System.Console]::ReadLine()
+Clear-Host
+
+# --- Process Explorer ---
+Write-Host "=== Process Explorer ===" -ForegroundColor Cyan
+
+$procexpUrl = "https://live.sysinternals.com/procexp.exe"
+$procexpPath = "$env:TEMP\procexp.exe"
+
+Write-Host "Downloading Process Explorer..." -ForegroundColor Green
+Invoke-WebRequest -Uri $procexpUrl -OutFile $procexpPath
+
+Write-Host "Launching Process Explorer..." -ForegroundColor Green
+Start-Process $procexpPath
+
+Write-Host "NOTE: Full screen and **Scroll all the way down**!" -ForegroundColor Yellow
+
+Write-Host "Press Enter to Continue..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
 
 Write-Host "Press Enter to finish the script..." -ForegroundColor Cyan
 [void][System.Console]::ReadLine()
