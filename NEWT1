@@ -171,6 +171,7 @@ function Show-RegistryKey {
 
 Write-Host "=== Registry Check ===" -ForegroundColor Cyan
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions"
+Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Extensions"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\IpAddresses"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths"
 Show-RegistryKey -RegPath "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender\Exclusions\Processes"
